@@ -22,37 +22,38 @@ def random_string(lower=5, upper=15):
 
 async def serve(sock, path):
     logging.info('handling socket %s at path %s', sock, path)
-    logging.debug('awaiting data')
-    msg = await sock.recv()
-    logging.debug('received message: %s', msg)
+    while True:
+        logging.debug('awaiting data')
+        msg = await sock.recv()
+        logging.debug('received message: %s', msg)
 
-    msg = json.loads(msg)
-    if 'command' not in msg:
-        logging.error('no command type found in message')
-        return
+        msg = json.loads(msg)
+        if 'command' not in msg:
+            logging.error('no command type found in message')
+            continue
 
-    if 'site' not in msg:
-        logging.error('site not found in message')
-        return
+        if 'site' not in msg:
+            logging.error('site not found in message')
+            continue
 
-    cmd = msg['command'].lower()
+        cmd = msg['command'].lower()
 
-    if cmd == CREDS_SEARCH:
-        logging.debug('received SEARCH')
-        ret = {
-            'command': CANDIDATE_CREDS,
-            'site': msg['site'],
-            'credentials': [
-                {'username': random_string(), 'password': random_string()} for _ in range(rand.randint(3, 8))
-            ]
-        }
+        if cmd == CREDS_SEARCH:
+            logging.info('received SEARCH')
+            ret = {
+                'command': CANDIDATE_CREDS,
+                'site': msg['site'],
+                'credentials': [
+                    {'username': random_string(), 'password': random_string()} for _ in range(rand.randint(3, 8))
+                ]
+            }
 
-        await sock.send(json.dumps(ret))
-        loging.info('sent CANDIDATE')
+            await sock.send(json.dumps(ret))
+            logging.info('sent CANDIDATE')
 
-    if cmd == CREDS_STORE:
-        logging.info('received STORE')
-        pass
+        if cmd == CREDS_STORE:
+            logging.info('received STORE')
+            pass
 
 
 server = websockets.serve(serve, 'localhost', 4000)
