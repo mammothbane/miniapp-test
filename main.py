@@ -29,11 +29,11 @@ async def serve(sock, path):
     msg = json.loads(msg)
     if 'command' not in msg:
         logging.error('no command type found in message')
-        continue
+        return
 
     if 'site' not in msg:
         logging.error('site not found in message')
-        continue
+        return
 
     cmd = msg['command'].lower()
 
