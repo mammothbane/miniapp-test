@@ -11,6 +11,8 @@ import string
 CREDS_SEARCH = 'credentials_search'
 CANDIDATE_CREDS = 'candidate_credentials'
 CREDS_STORE = 'credentials_store'
+EXT_CLICKED = 'ext_icon_clicked'
+BROWSER_FOCUSED = 'browser_focused'
 
 random_chars = string.ascii_letters + string.digits
 rand = random.Random()
@@ -27,22 +29,18 @@ async def serve(sock, path):
         msg = await sock.recv()
         logging.debug('received message: %s', msg)
 
-        msg = json.loads(msg)
-        if 'command' not in msg:
+        data = json.loads(msg)
+        if 'command' not in data:
             logging.error('no command type found in message')
             continue
 
-        if 'site' not in msg:
-            logging.error('site not found in message')
-            continue
-
-        cmd = msg['command'].lower()
+        cmd = data['command'].lower()
 
         if cmd == CREDS_SEARCH:
             logging.info('received SEARCH')
             ret = {
                 'command': CANDIDATE_CREDS,
-                'site': msg['site'],
+                'site': data['site'],
                 'credentials': [
                     {'username': random_string(), 'password': random_string()} for _ in range(rand.randint(3, 8))
                 ]
@@ -53,7 +51,12 @@ async def serve(sock, path):
 
         if cmd == CREDS_STORE:
             logging.info('received STORE')
-            pass
+
+        if cmd == BROWSER_FOCUSED:
+            logging.info('received BROWSER_FOCUS')
+
+        if cmd == EXT_CLICKED:
+            logging.info('received EXT_CLICKED')
 
 
 server = websockets.serve(serve, 'localhost', 4000)
