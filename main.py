@@ -13,6 +13,7 @@ FILL_FORM = 'fill_form'
 CREDS_STORE = 'credentials_store'
 EXT_CLICKED = 'ext_icon_clicked'
 BROWSER_FOCUSED = 'browser_focused'
+NAVIGATE = 'navigate'
 
 random_chars = string.ascii_letters + string.digits
 
@@ -43,7 +44,8 @@ async def serve(sock, path):
                 'credentials': {
                     'username': random_string(),
                     'password': random_string(),
-                }
+                },
+                'id': data['id'] if 'id' in data else 'ACTIVE_TAB',
             }
 
             await sock.send(json.dumps(ret))
@@ -58,6 +60,10 @@ async def serve(sock, path):
         if cmd == EXT_CLICKED:
             logging.info('received EXT_CLICKED')
 
+        if cmd == NAVIGATE:
+            logging.info('received debug NAVIGATE')
+            await sock.send(msg)
+            logging.info('sent NAVIGATE')
 
 server = websockets.serve(serve, 'localhost', 4000)
 
