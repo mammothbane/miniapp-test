@@ -9,18 +9,17 @@ import random
 import string
 
 CREDS_SEARCH = 'credentials_search'
-CANDIDATE_CREDS = 'candidate_credentials'
+FILL_FORM = 'fill_form'
 CREDS_STORE = 'credentials_store'
 EXT_CLICKED = 'ext_icon_clicked'
 BROWSER_FOCUSED = 'browser_focused'
 
 random_chars = string.ascii_letters + string.digits
-rand = random.Random()
 
 logging.basicConfig(level=logging.DEBUG)
 
 def random_string(lower=5, upper=15):
-    return ''.join(rand.choices(random_chars, k=rand.randint(lower, upper)))
+    return ''.join(random.choices(random_chars, k=random.randint(lower, upper)))
 
 async def serve(sock, path):
     logging.info('handling socket %s at path %s', sock, path)
@@ -39,15 +38,16 @@ async def serve(sock, path):
         if cmd == CREDS_SEARCH:
             logging.info('received SEARCH')
             ret = {
-                'command': CANDIDATE_CREDS,
+                'command': FILL_FORM,
                 'site': data['site'],
-                'credentials': [
-                    {'username': random_string(), 'password': random_string()} for _ in range(rand.randint(3, 8))
-                ]
+                'credentials': {
+                    'username': random_string(),
+                    'password': random_string(),
+                }
             }
 
             await sock.send(json.dumps(ret))
-            logging.info('sent CANDIDATE')
+            logging.info('sent FILL_FORM')
 
         if cmd == CREDS_STORE:
             logging.info('received STORE')
