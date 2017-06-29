@@ -9,7 +9,7 @@ import random
 import string
 
 CREDS_SEARCH = 'credentials_search'
-FILL_FORM = 'fill_form'
+CREDS_SUGGEST = 'credentials_suggest'
 CREDS_STORE = 'credentials_store'
 EXT_CLICKED = 'ext_icon_clicked'
 BROWSER_FOCUSED = 'browser_focused'
@@ -39,17 +39,17 @@ async def serve(sock, path):
         if cmd == CREDS_SEARCH:
             logging.info('received SEARCH')
             ret = {
-                'command': FILL_FORM,
+                'command': CREDS_SUGGEST,
                 'site': data['site'],
-                'credentials': {
+                'credentials': [{
                     'username': random_string(),
                     'password': random_string(),
-                },
-                'id': data['id'] if 'id' in data else 'ACTIVE_TAB',
+                }],
+                'id': data['id'],
             }
 
             await sock.send(json.dumps(ret))
-            logging.info('sent FILL_FORM')
+            logging.info('sent SUGGEST')
 
         if cmd == CREDS_STORE:
             logging.info('received STORE')
