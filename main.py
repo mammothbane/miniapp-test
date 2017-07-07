@@ -22,6 +22,9 @@ logging.basicConfig(level=logging.DEBUG)
 def random_string(lower=5, upper=15):
     return ''.join(random.choices(random_chars, k=random.randint(lower, upper)))
 
+def random_creds(count=1):
+    return [{'username': random_string(), 'password': random_string()} for _ in range(count)]
+
 async def serve(sock, path):
     logging.info('handling socket %s at path %s', sock, path)
     while True:
@@ -41,11 +44,8 @@ async def serve(sock, path):
             ret = {
                 'command': CREDS_SUGGEST,
                 'site': data['site'],
-                'credentials': [{
-                    'username': random_string(),
-                    'password': random_string(),
-                }],
-                'id': data['id'],
+                'credentials': random_creds(10),
+                'session': data['session'],
             }
 
             await sock.send(json.dumps(ret))
