@@ -10,9 +10,10 @@ import string
 
 CREDS_SEARCH = 'credentials_search'
 CREDS_SUGGEST = 'credentials_suggest'
+CREDS_REQEUST = 'request_credential'
+CREDS_PROVIDE = 'provide_credential'
 CREDS_STORE = 'credentials_store'
 EXT_CLICKED = 'ext_icon_clicked'
-BROWSER_FOCUSED = 'browser_focused'
 NAVIGATE = 'navigate'
 
 random_chars = string.ascii_letters + string.digits
@@ -23,7 +24,7 @@ def random_string(lower=5, upper=15):
     return ''.join(random.choices(random_chars, k=random.randint(lower, upper)))
 
 def random_creds(count=1):
-    return [{'username': random_string(), 'password': random_string()} for _ in range(count)]
+    return [{'username': random_string(), 'uuid': random_string(), 'title': random_string(), 'site': random_string()} for _ in range(count)]
 
 async def serve(sock, path):
     logging.info('handling socket %s at path %s', sock, path)
@@ -43,7 +44,6 @@ async def serve(sock, path):
             logging.info('received SEARCH')
             ret = {
                 'command': CREDS_SUGGEST,
-                'site': data['site'],
                 'credentials': random_creds(10),
                 'session': data['session'],
             }
@@ -51,11 +51,23 @@ async def serve(sock, path):
             await sock.send(json.dumps(ret))
             logging.info('sent SUGGEST')
 
+        if cmd == CREDS_REQEUST:
+            logging.info('received REQUEST')
+            ret = {
+                'command': CREDS_PROVIDE,
+                'credential': {
+                    'username': random_string(),
+                    'uuid': data['uuid'],
+                    'title': random_string(),
+                    'site': random_string(),
+                    'password': random_string()
+                }
+            }
+            await sock.send(json.dumps(ret))
+            logging.info('sent PROVIDE')
+
         if cmd == CREDS_STORE:
             logging.info('received STORE')
-
-        if cmd == BROWSER_FOCUSED:
-            logging.info('received BROWSER_FOCUS')
 
         if cmd == EXT_CLICKED:
             logging.info('received EXT_CLICKED')
