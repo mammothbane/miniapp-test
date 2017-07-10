@@ -61,7 +61,8 @@ async def serve(sock, path):
                     'title': random_string(),
                     'site': random_string(),
                     'password': random_string()
-                }
+                },
+                'session': data['session']
             }
             await sock.send(json.dumps(ret))
             logging.info('sent PROVIDE')
