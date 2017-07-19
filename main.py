@@ -33,7 +33,7 @@ async def serve(sock, path):
         msg = await sock.recv()
         logging.debug('received message: %s', msg)
 
-        data = json.loads(msg)
+        data = json.loads(msg)['data']
         if 'command' not in data:
             logging.error('no command type found in message')
             continue
