@@ -44,7 +44,7 @@ async def serve(sock, path):
             logging.info('received SEARCH')
             ret = {
                 'command': CREDS_SUGGEST,
-                'credentials': random_creds(10),
+                'credentials': random_creds(5),
                 'session': data['session'],
             }
 
