@@ -17,14 +17,18 @@ EXT_CLICKED = 'ext_icon_clicked'
 NAVIGATE = 'navigate'
 
 random_chars = string.ascii_letters + string.digits
+tlds = ['com', 'net', 'org', 'edu', 'io', 'se', 'co.uk', 'biz']
 
 logging.basicConfig(level=logging.DEBUG)
 
 def random_string(lower=5, upper=15):
     return ''.join(random.choices(random_chars, k=random.randint(lower, upper)))
 
+def random_email():
+    return '{}@{}.{}'.format(random_string(4, 11), random_string(4, 8), random.choice(tlds))
+
 def random_creds(count=1):
-    return [{'username': random_string(), 'uuid': random_string(), 'title': random_string(), 'site': random_string()} for _ in range(count)]
+    return [{'username': random_email(), 'uuid': random_string(), 'title': random_string(), 'site': random_string()} for _ in range(count)]
 
 async def serve(sock, path):
     logging.info('handling socket %s at path %s', sock, path)
@@ -56,7 +60,7 @@ async def serve(sock, path):
             ret = {
                 'command': CREDS_PROVIDE,
                 'credential': {
-                    'username': random_string(),
+                    'username': random_email(),
                     'uuid': data['uuid'],
                     'title': random_string(),
                     'site': random_string(),
