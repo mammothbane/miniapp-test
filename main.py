@@ -19,7 +19,8 @@ NAVIGATE = 'navigate'
 random_chars = string.ascii_letters + string.digits
 tlds = ['com', 'net', 'org', 'edu', 'io', 'se', 'co.uk', 'biz']
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
+logging.getLogger('websockets').setLevel(logging.INFO)
 
 def random_string(lower=5, upper=15):
     return ''.join(random.choices(random_chars, k=random.randint(lower, upper)))
@@ -45,7 +46,7 @@ async def serve(sock, path):
         cmd = data['command'].lower()
 
         if cmd == CREDS_SEARCH:
-            logging.info('received SEARCH')
+            logging.debug('received SEARCH')
             ret = {
                 'command': CREDS_SUGGEST,
                 'credentials': random_creds(random.randint(2, 6)),
@@ -53,10 +54,10 @@ async def serve(sock, path):
             }
 
             await sock.send(json.dumps(ret))
-            logging.info('sent SUGGEST')
+            logging.debug('sent SUGGEST')
 
         if cmd == CREDS_REQEUST:
-            logging.info('received REQUEST')
+            logging.debug('received REQUEST')
             ret = {
                 'command': CREDS_PROVIDE,
                 'credential': {
@@ -69,7 +70,7 @@ async def serve(sock, path):
                 'session': data['session']
             }
             await sock.send(json.dumps(ret))
-            logging.info('sent PROVIDE')
+            logging.debug('sent PROVIDE')
 
         if cmd == CREDS_STORE:
             logging.info('received STORE')
