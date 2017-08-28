@@ -10,11 +10,15 @@ import string
 
 CREDS_SEARCH = 'credentials_search'
 CREDS_SUGGEST = 'credentials_suggest'
-CREDS_REQEUST = 'request_credential'
+CREDS_REQUEST = 'request_credential'
 CREDS_PROVIDE = 'provide_credential'
 CREDS_STORE = 'credentials_store'
+CREDS_COMMIT = 'credentials_commit'
+CREDS_ABORT = 'credentials_abort'
 EXT_CLICKED = 'ext_icon_clicked'
 NAVIGATE = 'navigate'
+LOCK_CHECK = 'valt_lock_check'
+LOCK_STATE = 'valt_lock_state'
 
 random_chars = string.ascii_letters + string.digits
 tlds = ['com', 'net', 'org', 'edu', 'io', 'se', 'co.uk', 'biz']
@@ -56,7 +60,7 @@ async def serve(sock, path):
             await sock.send(json.dumps(ret))
             logging.debug('sent SUGGEST')
 
-        if cmd == CREDS_REQEUST:
+        if cmd == CREDS_REQUEST:
             logging.debug('received REQUEST')
             ret = {
                 'command': CREDS_PROVIDE,
@@ -72,8 +76,24 @@ async def serve(sock, path):
             await sock.send(json.dumps(ret))
             logging.debug('sent PROVIDE')
 
+        if cmd == LOCK_CHECK:
+            logging.debug('received LOCK_CHECK')
+            ret = {
+                'command': LOCK_STATE,
+                'locked': false,
+                'session': data['session']
+            }
+            await sock.send(json.dumps(ret))
+            logging.debug('sent LOCK_UPDATE')
+            
         if cmd == CREDS_STORE:
             logging.info('received STORE')
+
+        if cmd == CREDS_COMMIT:
+            logging.info('received COMMIT')
+
+        if cmd == CREDS_ABORT:
+            logging.info('received ABORT')    
 
         if cmd == EXT_CLICKED:
             logging.info('received EXT_CLICKED')
