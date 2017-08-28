@@ -80,7 +80,7 @@ async def serve(sock, path):
             logging.debug('received LOCK_CHECK')
             ret = {
                 'command': LOCK_STATE,
-                'locked': false,
+                'locked': False,
                 'session': data['session']
             }
             await sock.send(json.dumps(ret))
